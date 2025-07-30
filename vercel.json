@@ -7,17 +7,16 @@
     },
     {
       "src": "frontend_nextjs/package.json",
-      "use": "@vercel/next"
+      "use": "@vercel/next",
+      "config": { "distDir": "out" }
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/backend_flask/app.py"
+      "dest": "backend_flask/app.py"
     },
-    {
-      "src": "/(.*)",
-      "dest": "frontend_nextjs"
-    }
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/frontend_nextjs/$1" }
   ]
 }

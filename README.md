@@ -56,7 +56,7 @@ Este proyecto está configurado para un despliegue sencillo en Vercel como un mo
 
 1.  **Sube tu repositorio a GitHub, GitLab o Bitbucket.**
 2.  **Importa el proyecto en Vercel.** Vercel detectará automáticamente la configuración del monorepo gracias al archivo `vercel.json`.
-3.  **Configura las variables de entorno.** En el panel de tu proyecto en Vercel, ve a `Settings -> Environment Variables` y añade las mismas credenciales que tienes en tu archivo `backend_flask/.env`:
+3.  **Configura las variables de entorno.** En el panel de tu proyecto en Vercel, ve a `Settings -> Environment Variables` y añade las mismas credenciales que tienes en tu archivo `backend_flask/.env`. Asegúrate de que Vercel esté configurado para usar el "Root Directory" en la raíz del proyecto, no dentro de `frontend_nextjs`.
     -   `MERCHANT_ID` 
     -   `TERMINAL_ID`
     -   `CIPHER_KEY`
