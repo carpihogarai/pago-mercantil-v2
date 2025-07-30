@@ -14,8 +14,12 @@ CORS(app)
 @app.route("/")
 def index():
     return "API Mercantil Flask"
-
-@app.route("/create-c2p-payment", methods=["POST"])
+    
+@app.route("/api")
+def api_index():
+    return "API Mercantil Flask is running."
+    
+@app.route("/api/create-c2p-payment", methods=["POST"])
 def create_c2p_payment():
     """
     Endpoint para iniciar un pago móvil C2P con cifrado y llamada real al sandbox.
