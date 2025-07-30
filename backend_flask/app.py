@@ -81,15 +81,20 @@ def create_c2p_payment():
         response.raise_for_status()  # Lanza una excepción para códigos de error HTTP (4xx o 5xx)
 
         response_data = response.json()
-        return jsonify(response_data)
 
-    except requests.exceptions.RequestException as e:
+        # Si la respuesta del banco tiene un 'description', úsalo como mensaje de éxito.
+        success_message = response_data.get("description", "Pago procesado exitosamente.")
+        return jsonify({"message": success_message, "data": response_data})
+
+    except requests.exceptions.HTTPError as e:
+        # Captura errores específicos de la API del banco (4xx, 5xx)
+        error_body = e.response.json()
+        error_message = error_body.get("description", "Error desconocido devuelto por el banco.")
+        print(f"Error de la API de Mercantil: {e.response.status_code} - {error_message}")
+        return jsonify({"error": error_message}), e.response.status_code
+    except requests.exceptions.RequestException as e: # Errores de conexión, timeout, etc.
         print(f"Error de conexión con la API de Mercantil: {e}")
-        return jsonify({"error": "No se pudo conectar con el servicio de pago."}), 503
+        return jsonify({"error": "No se pudo conectar con el servicio de pago. Intente de nuevo más tarde."}), 503
     except Exception as e:
         print(f"Error inesperado durante el proceso de pago: {e}")
         return jsonify({"error": "Ocurrió un error interno al procesar el pago."}), 500
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(debug=True, host="0.0.0.0", port=port)
