@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "backend_flask/app.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "frontend_nextjs/package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/backend_flask/app.py"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/frontend_nextjs/$1"
+    }
+  ]
+}

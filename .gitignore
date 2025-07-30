@@ -1,0 +1,26 @@
+### Entornos y dependencias
+# Fichero de variables de entorno
+.env
+# Virtualenv Python
+backend_flask/venv/
+
+### Cachés y artefactos de Python
+backend_flask/__pycache__/
+**/*.pyc
+
+### Node / Next.js
+frontend_nextjs/node_modules/
+frontend_nextjs/.next/
+frontend_nextjs/out/
+
+### Logs
+*.log
+
+### Carpetas de control de versiones anidadas
+encrypt-examples/**/.git
+postman-project/**/.git
+
+### Archivos de sistemas y editores
+.DS_Store
+.vscode/
+.idea/
