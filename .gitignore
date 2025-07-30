@@ -1,26 +1,55 @@
-### Entornos y dependencias
-# Fichero de variables de entorno
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# pyenv
+.python-version
+
+# dotenv
 .env
-# Virtualenv Python
-backend_flask/venv/
 
-### Cachés y artefactos de Python
-backend_flask/__pycache__/
-**/*.pyc
+# virtualenv
+venv/
+env/
 
-### Node / Next.js
-frontend_nextjs/node_modules/
-frontend_nextjs/.next/
-frontend_nextjs/out/
-
-### Logs
+# logs
 *.log
 
-### Carpetas de control de versiones anidadas
-encrypt-examples/**/.git
-postman-project/**/.git
+# Next.js
+frontend_nextjs/node_modules
+frontend_nextjs/.next
+frontend_nextjs/out
+frontend_nextjs/.env.local
 
-### Archivos de sistemas y editores
+# Vercel
+.vercel
+
+# OS / Editor
 .DS_Store
 .vscode/
 .idea/

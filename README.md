@@ -1,12 +1,11 @@
 # Pago Mercantil v2
 
-Este proyecto implementa una pasarela de pago para Mercantil Banco, con integración C2P (Pago móvil) y un stub para pagos con tarjeta.
-La solución está compuesta por un backend en Flask que se comunica con el sandbox de Mercantil Banco, y un frontend ligero con Next.js con un formulario HTML/CSS responsive.
+Este proyecto implementa una pasarela de pago para Mercantil Banco, enfocada en la integración de **Pago Móvil C2P**.
+La solución está compuesta por un backend en Flask que se comunica con el sandbox de Mercantil y un frontend moderno con Next.js y TailwindCSS.
 
 ## Funcionalidades
 
-- **Pago móvil C2P**: cifrado AES-128-ECB de datos sensibles (cédula, teléfono, two‑factor) y envío al endpoint sandbox de Mercantil Banco.
-- **Stub de pago con tarjeta**: punto de partida para integrar la API de pagos con tarjeta de Mercantil (pendiente de implementación real).
+- **Pago Móvil C2P**: Realiza el cifrado AES-128-ECB de los datos sensibles (cédula, teléfono, clave de compra) y se comunica con el endpoint de sandbox de Mercantil.
 - **Interfaz simple y responsive**: formulario HTML/CSS sin dependencias complejas, adaptado a todo tipo de pantallas.
 - **Colección Postman**: peticiones preparadas para probar los distintos endpoints de la API.
 - **Ejemplos de cifrado**: scripts en Java, .NET, PHP y Node.js para generar valores cifrados según la especificación de Mercantil Banco.
@@ -30,24 +29,16 @@ La solución está compuesta por un backend en Flask que se comunica con el sand
 
 ### 1. Backend (Flask)
 
-```bash
-cd backend_flask
-# Activar virtualenv (Windows PowerShell):
-.\venv\Scripts\Activate.ps1
-# o Linux/macOS:
-source venv/bin/activate
+1.  **Navega a la carpeta del backend:** `cd backend_flask`
+2.  **Crea un entorno virtual:** `python -m venv venv`
+3.  **Activa el entorno:**
+    -   Windows: `.\venv\Scripts\Activate.ps1`
+    -   macOS/Linux: `source venv/bin/activate`
+4.  **Instala las dependencias:** `pip install -r requirements.txt`
+5.  **Configura tus credenciales:** Copia el archivo `.env.example` a un nuevo archivo llamado `.env` y verifica que los valores sean correctos.
+6.  **Ejecuta la API:** `flask run`
 
-# Instalar dependencias (opcional si ya están en venv):
-pip install flask flask-cors python-dotenv requests pycryptodome
-
-# Configurar credenciales en backend_flask/.env:
-# MERCHANT_ID, TERMINAL_ID, CIPHER_KEY, IBM_CLIENT_ID, C2P_URL
-
-# Ejecutar la API:
-flask run --host=0.0.0.0 --port=5000
-```
-
-La API quedará disponible en http://localhost:5000
+La API quedará disponible en `http://localhost:5000`.
 
 ### 2. Frontend (Next.js)
 
@@ -55,7 +46,7 @@ La API quedará disponible en http://localhost:5000
 cd frontend_nextjs
 npm install
 npm run dev
-```
+``` 
 
 Abre http://localhost:3000 en tu navegador para ver el formulario.
 
@@ -66,7 +57,7 @@ Este proyecto está configurado para un despliegue sencillo en Vercel como un mo
 1.  **Sube tu repositorio a GitHub, GitLab o Bitbucket.**
 2.  **Importa el proyecto en Vercel.** Vercel detectará automáticamente la configuración del monorepo gracias al archivo `vercel.json`.
 3.  **Configura las variables de entorno.** En el panel de tu proyecto en Vercel, ve a `Settings -> Environment Variables` y añade las mismas credenciales que tienes en tu archivo `backend_flask/.env`:
-    -   `MERCHANT_ID`
+    -   `MERCHANT_ID` 
     -   `TERMINAL_ID`
     -   `CIPHER_KEY`
     -   `IBM_CLIENT_ID`
@@ -79,9 +70,8 @@ Importa `postman-project/API-PAYMENT.postman_collection.json` y configura el hea
 Actualiza los cuerpos de las peticiones con los campos cifrados (puedes apoyarte en los ejemplos de `encrypt-examples/`) y envía las solicitudes al endpoint correspondiente.
 
 ## Ejemplos de cifrado
-
 Consulta la carpeta `encrypt-examples/` para ver scripts de encriptado y desencriptado en Java, .NET, PHP y Node.js, compatibles con la especificación de Mercantil Banco.
 
 ---
 
-**¡Listo!** Ya tienes un entorno completo para probar la integración C2P con Mercantil Banco en sandbox y un punto de partida para pagos con tarjeta.
+**¡Listo!** Ya tienes un entorno completo para probar la integración C2P con Mercantil Banco en su entorno de pruebas (sandbox).

@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 from dotenv import load_dotenv
-import time
 import requests
 from encryption import encrypt_aes_128_ecb
 
@@ -15,22 +14,6 @@ CORS(app)
 @app.route("/")
 def index():
     return "API Mercantil Flask"
-
-@app.route("/create-card-payment", methods=["POST"])
-def create_card_payment():
-    """
-    Stub para la creación de un pago con tarjeta.
-    En una implementación real, aquí se generaría una sesión de pago
-    y se devolvería la URL del iframe del banco.
-    """
-    # Simula una llamada a la API del banco que toma tiempo
-    time.sleep(2)
-
-    # URL de ejemplo para el iframe (esto debería venir del banco)
-    # Esta URL es solo un ejemplo y no es funcional.
-    payment_url = "https://example.com/payment-iframe"
-
-    return jsonify({"paymentUrl": payment_url})
 
 @app.route("/create-c2p-payment", methods=["POST"])
 def create_c2p_payment():
@@ -53,15 +36,15 @@ def create_c2p_payment():
     if not data:
         return jsonify({"error": "No se recibieron datos"}), 400
 
-    required_fields = ["telefono", "ci", "banco", "destino", "purchase_key", "amount"]
+    required_fields = ["c2pPhone", "c2pId", "c2pBank", "destMobile", "purchaseKey", "amount"]
     if not all(field in data for field in required_fields):
         return jsonify({"error": "Faltan campos requeridos"}), 400
 
     try:
         # 3. Cifrar los campos sensibles
-        encrypted_phone = encrypt_aes_128_ecb(cipher_key, data['telefono'])
-        encrypted_id = encrypt_aes_128_ecb(cipher_key, data['ci'])
-        encrypted_purchase_key = encrypt_aes_128_ecb(cipher_key, data['purchase_key'])
+        encrypted_phone = encrypt_aes_128_ecb(cipher_key, data['c2pPhone'])
+        encrypted_id = encrypt_aes_128_ecb(cipher_key, data['c2pId'])
+        encrypted_purchase_key = encrypt_aes_128_ecb(cipher_key, data['purchaseKey'])
 
         # 4. Construir el payload para la API de Mercantil (alineado con la documentación de Postman)
         payload = {
@@ -76,9 +59,9 @@ def create_c2p_payment():
             "transaction_c2p": {
                 "amount": data['amount'],
                 "currency": "ves",
-                "destination_bank_id": data['banco'],
+                "destination_bank_id": data['c2pBank'],
                 "destination_id": encrypted_id,
-                "destination_mobile_number": data['destino'],
+                "destination_mobile_number": data['destMobile'],
                 "origin_mobile_number": encrypted_phone,
                 "payment_reference": "", # El banco lo genera, se envía vacío
                 "trx_type": "compra",
