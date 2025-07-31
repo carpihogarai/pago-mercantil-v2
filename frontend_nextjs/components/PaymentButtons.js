@@ -1,23 +1,17 @@
 import { useState } from "react";
 import {
   DevicePhoneMobileIcon,
-  UserIcon,
-  BuildingLibraryIcon,
   KeyIcon,
   CurrencyDollarIcon,
   QuestionMarkCircleIcon,
   ArrowPathIcon,
 } from "@heroicons/react/24/solid";
-
 export default function PaymentButtons() {
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState({ message: "", type: "" }); // 'success' or 'error'
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({ // 1. Centralizar estado del formulario
     amount: "",
     c2pPhone: "",
-    c2pId: "",
-    c2pBank: "",
-    destMobile: "",
     purchaseKey: "",
   });
   const [formErrors, setFormErrors] = useState({});
@@ -28,7 +22,8 @@ export default function PaymentButtons() {
     setIsLoading(true);
     setStatus({ message: "", type: "" });
     try {
-      const res = await fetch(`/api/create-c2p-payment`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+      const res = await fetch(`${apiUrl}/api/create-c2p-payment`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -38,13 +33,10 @@ export default function PaymentButtons() {
         throw new Error(data.error || "Error al procesar el pago C2P.");
       }
       setStatus({ message: data.message || "Pago C2P iniciado con éxito.", type: "success" });
-      // Limpiar formulario en caso de éxito
+      // Limpiar formulario en caso de éxito (ya funciona con el estado centralizado)
       setFormData({
         amount: "",
         c2pPhone: "",
-        c2pId: "",
-        c2pBank: "",
-        destMobile: "",
         purchaseKey: "",
       });
     } catch (err) {
@@ -58,19 +50,8 @@ export default function PaymentButtons() {
     let error = "";
     switch (name) {
       case 'c2pPhone':
-      case 'destMobile':
         if (!/^58\d{10}$/.test(value)) {
           error = "Debe tener el formato 58XXXXXXXXXX.";
-        }
-        break;
-      case 'c2pId':
-        if (!/^[VEJGP]\d{7,9}$/i.test(value)) {
-          error = "Formato de cédula inválido (Ej: V12345678).";
-        }
-        break;
-      case 'c2pBank':
-        if (!/^\d{4}$/.test(value)) {
-          error = "Debe ser un código de 4 dígitos.";
         }
         break;
       case 'purchaseKey':
@@ -95,7 +76,7 @@ export default function PaymentButtons() {
     validateField(name, value);
   };
   
-  const isFormInvalid = Object.values(formErrors).some(e => e) || Object.values(formData).some(v => v === "");
+  const isFormInvalid = Object.values(formErrors).some(e => e) || Object.values(formData).some(v => v === ""); // 3. La validación ahora es más simple
 
   return (
     <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-6 sm:p-8">
@@ -117,9 +98,6 @@ export default function PaymentButtons() {
         <form onSubmit={handleC2pPayment} className="space-y-4" noValidate>
           <InputField label="Monto a pagar (Bs.)" name="amount" value={formData.amount} onChange={handleInputChange} placeholder="150.00" error={formErrors.amount} icon={<CurrencyDollarIcon />} />
           <InputField label="Teléfono origen" name="c2pPhone" value={formData.c2pPhone} onChange={handleInputChange} placeholder="584142591177" error={formErrors.c2pPhone} icon={<DevicePhoneMobileIcon />} />
-          <InputField label="Cédula destino" name="c2pId" value={formData.c2pId} onChange={handleInputChange} placeholder="V18367443" error={formErrors.c2pId} icon={<UserIcon />} />
-          <InputField label="Banco destino" name="c2pBank" value={formData.c2pBank} onChange={handleInputChange} placeholder="0105" error={formErrors.c2pBank} icon={<BuildingLibraryIcon />} />
-          <InputField label="Teléfono destino" name="destMobile" value={formData.destMobile} onChange={handleInputChange} placeholder="584241513063" error={formErrors.destMobile} icon={<DevicePhoneMobileIcon />} />
           <div className="relative">
             <InputField 
               label="Clave de compra" 
@@ -134,7 +112,7 @@ export default function PaymentButtons() {
             />
             {showKeyHelp && (
               <div className="mt-2 p-3 bg-blue-50 border border-blue-200 text-blue-800 text-xs rounded-lg">
-                Obtén tu <strong>Clave de Compra</strong> desde la app Mercantil o Amigo en Línea para autorizar esta transacción.
+                Para autorizar el pago, genera una <strong>Clave de Compra C2P</strong> temporal desde tu App Mercantil (Pago Móvil) o Mercantil en Línea e ingrésala aquí.
               </div>
             )}
           </div>
