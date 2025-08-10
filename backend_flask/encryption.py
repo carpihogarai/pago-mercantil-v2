@@ -3,7 +3,6 @@ import hashlib
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
 
-<<<<<<< HEAD
 def encrypt_aes_128_ecb(key_bytes: bytes, data: str) -> str:
     """
     Cifra los datos usando AES-128-ECB con padding PKCS7 y devuelve una cadena en base64.
@@ -21,20 +20,6 @@ def encrypt_aes_128_ecb(key_bytes: bytes, data: str) -> str:
         # Este error es más claro y apunta al problema real si algo sale mal.
         raise TypeError(f"La clave de cifrado debe ser un objeto de 16 bytes, pero se recibió un objeto de tipo {type(key_bytes).__name__} con longitud {len(key_bytes)}.")
 
-=======
-def derive_aes_key_from_long_key(long_key: str) -> bytes:
-    """
-    Deriva una clave AES-128 válida (16 bytes) a partir de una clave larga usando SHA-256.
-    """
-    sha256 = hashlib.sha256(long_key.encode('utf-8')).digest()
-    return sha256[:16]
-
-def encrypt_aes_128_ecb(key: str, data: str) -> str:
-    """
-    Cifra los datos usando AES-128-ECB con padding PKCS7 y devuelve una cadena en base64.
-    """
-    key_bytes = derive_aes_key_from_long_key(key)
->>>>>>> 011669553c488fd267a34561662f1d6ce0c36e3a
     data_bytes = data.encode('utf-8')
     cipher = AES.new(key_bytes, AES.MODE_ECB)
     padded_data = pad(data_bytes, AES.block_size)
