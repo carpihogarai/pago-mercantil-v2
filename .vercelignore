@@ -1,0 +1,5 @@
+# Ignorar el entorno virtual del backend para no subirlo a Vercel
+backend_flask/venv/
+
+# Ignorar la carpeta de build de Next.js (Vercel la genera en el servidor)
+frontend_nextjs/.next/

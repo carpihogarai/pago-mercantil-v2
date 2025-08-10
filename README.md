@@ -23,7 +23,7 @@ La solución está compuesta por un backend en Flask que se comunica con el sand
 
 - Python 3.8+ (backend)
 - Node.js 14+ (frontend)
-- Credenciales de sandbox de Mercantil Banco (MERCHANT_ID, TERMINAL_ID, CIPHER_KEY, IBM_CLIENT_ID, C2P_URL)
+- Credenciales de sandbox de Mercantil Banco (MERCHANT_ID, TERMINAL_ID, CIPHER_KEY, IBM_CLIENT_ID, C2P_URL, DESTINATION_ID, DESTINATION_PHONE, DESTINATION_BANK_CODE)
 
 ## Instalación y ejecución
 
@@ -50,9 +50,19 @@ npm run dev
 
 Abre http://localhost:3000 en tu navegador para ver el formulario.
 
-## Despliegue en Vercel
+## Despliegue en Producción
 
-Este proyecto está configurado para un despliegue sencillo en Vercel como un monorepo.
+Este proyecto está configurado para desplegar el backend Flask en Railway y el frontend Next.js en Vercel.
+
+### Opción 1: Despliegue Separado (Recomendado para Producción)
+
+Para un despliegue en producción, se recomienda usar Railway para el backend Flask y Vercel para el frontend Next.js.
+
+**Ver la guía completa en [DEPLOYMENT.md](./DEPLOYMENT.md)**
+
+### Opción 2: Despliegue Monorepo en Vercel (Solo para Desarrollo)
+
+Si deseas desplegar todo en Vercel (solo para desarrollo/pruebas):
 
 1.  **Sube tu repositorio a GitHub, GitLab o Bitbucket.**
 2.  **Importa el proyecto en Vercel.** Vercel detectará automáticamente la configuración del monorepo gracias al archivo `vercel.json`.
@@ -62,7 +72,12 @@ Este proyecto está configurado para un despliegue sencillo en Vercel como un mo
     -   `CIPHER_KEY`
     -   `IBM_CLIENT_ID`
     -   `C2P_URL`
+    -   `DESTINATION_ID`
+    -   `DESTINATION_PHONE`
+    -   `DESTINATION_BANK_CODE`
 4.  **Despliega.** Vercel construirá tanto el frontend como el backend y los desplegará en una URL de producción.
+
+**Nota**: El backend Flask en Vercel tiene limitaciones y no es recomendado para producción.
 
 ## Uso con Postman
 

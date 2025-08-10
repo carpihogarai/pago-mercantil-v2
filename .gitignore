@@ -1,55 +1,19 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+# Dependencies
+/node_modules
+/backend_flask/venv
 
-# C extensions
-*.so
+# Next.js build output
+/frontend_nextjs/.next
+/frontend_nextjs/out
 
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# pyenv
-.python-version
-
-# dotenv
+# Local environment files
 .env
+.env*.local
 
-# virtualenv
-venv/
-env/
+# Python cache
+__pycache__/
+*.pyc
 
-# logs
-*.log
-
-# Next.js
-frontend_nextjs/node_modules
-frontend_nextjs/.next
-frontend_nextjs/out
-frontend_nextjs/.env.local
-
-# Vercel
-.vercel
-
-# OS / Editor
+# IDE / OS files
+.vscode
 .DS_Store
-.vscode/
-.idea/
