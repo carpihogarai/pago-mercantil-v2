@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { useRouter } from 'next/router'; // Importar useRouter
 import {
   DevicePhoneMobileIcon,
   KeyIcon,
@@ -6,47 +7,17 @@ import {
   QuestionMarkCircleIcon,
   ArrowPathIcon,
 } from "@heroicons/react/24/solid";
-export default function PaymentButtons() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [status, setStatus] = useState({ message: "", type: "" }); // 'success' or 'error'
-  const [formData, setFormData] = useState({ // 1. Centralizar estado del formulario
+
+// --- Custom Hook para la lógica del formulario ---
+function usePaymentForm() {
+  const [formData, setFormData] = useState({
     amount: "",
     c2pPhone: "",
     purchaseKey: "",
   });
   const [formErrors, setFormErrors] = useState({});
-  const [showKeyHelp, setShowKeyHelp] = useState(false);
 
-  const handleC2pPayment = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setStatus({ message: "", type: "" });
-    try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
-      const res = await fetch(`${apiUrl}/api/create-c2p-payment`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "Error al procesar el pago C2P.");
-      }
-      setStatus({ message: data.message || "Pago C2P iniciado con éxito.", type: "success" });
-      // Limpiar formulario en caso de éxito (ya funciona con el estado centralizado)
-      setFormData({
-        amount: "",
-        c2pPhone: "",
-        purchaseKey: "",
-      });
-    } catch (err) {
-      setStatus({ message: err.message, type: "error" });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const validateField = (name, value) => {
+  const validateField = useCallback((name, value) => {
     let error = "";
     switch (name) {
       case 'c2pPhone':
@@ -68,15 +39,75 @@ export default function PaymentButtons() {
         break;
     }
     setFormErrors(prev => ({ ...prev, [name]: error }));
-  };
+  }, []);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     validateField(name, value);
+  }, [validateField]);
+
+  const resetForm = useCallback(() => {
+    setFormData({ amount: "", c2pPhone: "", purchaseKey: "" });
+    setFormErrors({});
+  }, []);
+
+  const isFormInvalid =
+    Object.values(formErrors).some(e => e) ||
+    Object.values(formData).some(v => v === "");
+
+  return { formData, formErrors, isFormInvalid, handleInputChange, resetForm };
+}
+
+export default function PaymentButtons() {
+  const router = useRouter(); // Inicializar el router
+  const [isLoading, setIsLoading] = useState(false);
+  const [status, setStatus] = useState({ message: "", type: "" }); // 'success' or 'error'
+  const {
+    formData,
+    formErrors,
+    isFormInvalid,
+    handleInputChange,
+    resetForm,
+  } = usePaymentForm();
+  const [showKeyHelp, setShowKeyHelp] = useState(false);
+
+  const handleC2pPayment = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setStatus({ message: "", type: "" });
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+      const res = await fetch(`${apiUrl}/api/create-c2p-payment`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+
+      if (!res.ok || data.status !== 'success') {
+        throw new Error(data.error || "Error al procesar el pago.");
+      }
+
+      // --- INICIO DE MODIFICACIÓN ---
+      // 1. El pago fue exitoso. Obtenemos el ID de la transacción.
+      const { transactionId } = data;
+
+      // 2. Redirigir al usuario a la página del recibo.
+      if (transactionId) {
+        router.push(`/pago/${transactionId}`);
+      } else {
+        // Si por alguna razón no hay ID, mostrar un error.
+        throw new Error("No se recibió un ID de transacción para generar el recibo.");
+      }
+      // --- FIN DE MODIFICACIÓN ---
+
+    } catch (err) {
+      setStatus({ message: err.message, type: "error" });
+      setIsLoading(false); // Detener el spinner en caso de error
+    }
+    // No necesitamos el finally, el loading se detiene solo en error o al cambiar de página
   };
-  
-  const isFormInvalid = Object.values(formErrors).some(e => e) || Object.values(formData).some(v => v === ""); // 3. La validación ahora es más simple
 
   return (
     <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-6 sm:p-8">

@@ -48,7 +48,7 @@ npm install
 npm run dev
 ``` 
 
-Abre http://localhost:3000 en tu navegador para ver el formulario.
+Abre http://localhost:3000 en tu navegador para ver el formulario de pago. Si el pago es exitoso, serás redirigido a una página con el recibo.
 
 ## Despliegue en Producción
 
