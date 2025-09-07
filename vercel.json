@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "frontend_nextjs/next.config.js",
+      "use": "@vercel/next"
+    },
+    {
+      "src": "backend_flask/app.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "backend_flask/app.py"
+    }
+  ]
+}
