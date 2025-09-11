@@ -51,12 +51,12 @@ class AppConfig:
 # --- Inicialización y Configuración ---
 app = Flask(__name__)
 
-# Configuración de CORS para permitir peticiones desde el frontend en Vercel
+# Configuración de CORS robusta
 origins = [
     "https://pago-mercantil-v2-xi.vercel.app",
     "http://localhost:3000" # Para desarrollo local
 ]
-CORS(app, resources={r"/api/*": {"origins": origins}})
+CORS(app, origins=origins, methods=["GET", "POST", "OPTIONS"], allow_headers=["Content-Type"], supports_credentials=True)
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
 
