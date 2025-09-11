@@ -5,6 +5,9 @@ __pycache__/
 *.pyo
 *.pyd
 
+# Base de datos local de transacciones
+/backend_flask/transactions.db
+
 # Node.js / Next.js
 /frontend_nextjs/node_modules/
 /frontend_nextjs/.next/
