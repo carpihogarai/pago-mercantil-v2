@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // Importar useEffect
 import {
   UserIcon,
   IdentificationIcon,
@@ -10,6 +10,10 @@ import {
 } from "@heroicons/react/24/solid";
 
 export default function CheckoutPage() {
+  useEffect(() => {
+    console.log("Cargando página de CHECKOUT...");
+  }, []);
+
   const router = useRouter();
   const { origin } = router.query;
   const [formData, setFormData] = useState({

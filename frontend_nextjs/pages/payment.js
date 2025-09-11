@@ -9,6 +9,7 @@ export default function PaymentPage() {
   const [checkoutData, setCheckoutData] = useState(null);
 
   useEffect(() => {
+    console.log("Cargando página de PAGO...");
     // Los datos del checkout se guardan en localStorage para persistir entre páginas.
     const savedData = localStorage.getItem('checkoutData');
     if (savedData) {
