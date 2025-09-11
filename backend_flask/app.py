@@ -50,7 +50,14 @@ class AppConfig:
 
 # --- Inicialización y Configuración ---
 app = Flask(__name__)
-CORS(app)
+
+# Configuración de CORS para permitir peticiones desde el frontend en Vercel
+origins = [
+    "https://pago-mercantil-v2-xi.vercel.app",
+    "http://localhost:3000" # Para desarrollo local
+]
+CORS(app, resources={r"/api/*": {"origins": origins}})
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
 
 DATABASE_FILE = 'transactions.db'
@@ -69,7 +76,6 @@ def init_db():
             )
         ''')
         
-        # Migraciones de la base de datos
         cursor.execute("PRAGMA table_info(transactions)")
         columns = [column[1] for column in cursor.fetchall()]
         if 'origin' not in columns:
