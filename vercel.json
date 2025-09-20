@@ -2,8 +2,11 @@
   "version": 2,
   "builds": [
     {
-      "src": "frontend_nextjs/**",
-      "use": "@vercel/next"
+      "src": "frontend_nextjs/package.json",
+      "use": "@vercel/next",
+      "config": {
+        "outputDirectory": ".next"
+      }
     }
   ],
   "routes": [
@@ -11,6 +14,5 @@
       "src": "/(.*)",
       "dest": "frontend_nextjs/$1"
     }
-  ],
-  "outputDirectory": "frontend_nextjs/.next"
+  ]
 }
