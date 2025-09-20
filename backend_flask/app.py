@@ -139,6 +139,8 @@ def _build_mercantil_payload(data, app_config):
 
 def _parse_bank_error(error_data):
     if isinstance(error_data, dict):
+        if "code" in error_data and error_data["code"] == 99999:
+            return "Error interno del banco (código 99999). Verifique la configuración o contacte a soporte."
         if "message" in error_data:
             return error_data["message"]
         if "error" in error_data and isinstance(error_data["error"], str):
