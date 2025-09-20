@@ -74,7 +74,14 @@ def init_db():
                 status TEXT NOT NULL,
                 request_data TEXT NOT NULL,
                 bank_response TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                full_name TEXT,
+                phone_number TEXT,
+                id_number TEXT,
+                billing_address TEXT,
+                shipping_address TEXT,
+                email TEXT,
+                amount_paid REAL
             )
         ''')
         
@@ -86,6 +93,27 @@ def init_db():
         if 'checkout_data' not in columns:
             cursor.execute("ALTER TABLE transactions ADD COLUMN checkout_data TEXT DEFAULT '''{}'''")
             app.logger.info("Columna 'checkout_data' añadida a la tabla de transacciones.")
+        if 'full_name' not in columns:
+            cursor.execute("ALTER TABLE transactions ADD COLUMN full_name TEXT")
+            app.logger.info("Columna 'full_name' añadida a la tabla de transacciones.")
+        if 'phone_number' not in columns:
+            cursor.execute("ALTER TABLE transactions ADD COLUMN phone_number TEXT")
+            app.logger.info("Columna 'phone_number' añadida a la tabla de transacciones.")
+        if 'id_number' not in columns:
+            cursor.execute("ALTER TABLE transactions ADD COLUMN id_number TEXT")
+            app.logger.info("Columna 'id_number' añadida a la tabla de transacciones.")
+        if 'billing_address' not in columns:
+            cursor.execute("ALTER TABLE transactions ADD COLUMN billing_address TEXT")
+            app.logger.info("Columna 'billing_address' añadida a la tabla de transacciones.")
+        if 'shipping_address' not in columns:
+            cursor.execute("ALTER TABLE transactions ADD COLUMN shipping_address TEXT")
+            app.logger.info("Columna 'shipping_address' añadida a la tabla de transacciones.")
+        if 'email' not in columns:
+            cursor.execute("ALTER TABLE transactions ADD COLUMN email TEXT")
+            app.logger.info("Columna 'email' añadida a la tabla de transacciones.")
+        if 'amount_paid' not in columns:
+            cursor.execute("ALTER TABLE transactions ADD COLUMN amount_paid REAL")
+            app.logger.info("Columna 'amount_paid' añadida a la tabla de transacciones.")
 
         conn.commit()
         conn.close()
@@ -178,12 +206,21 @@ def create_c2p_payment():
         internal_transaction_id = str(uuid.uuid4())
         origin = data.get('origin', 'unknown')
         checkout_data = json.dumps(data.get('checkoutData', {}))
+        personal_data = data.get('personalData', {})
+
+        full_name = personal_data.get('fullName')
+        phone_number = personal_data.get('phoneNumber')
+        id_number = personal_data.get('idNumber')
+        billing_address = personal_data.get('billingAddress')
+        shipping_address = personal_data.get('shippingAddress')
+        email = personal_data.get('email')
+        amount_paid = float(data.get('amount'))
 
         conn = sqlite3.connect(DATABASE_FILE)
         cursor = conn.cursor()
         cursor.execute(
-            "INSERT INTO transactions (id, status, request_data, bank_response, origin, checkout_data) VALUES (?, ?, ?, ?, ?, ?)",
-            (internal_transaction_id, "completed", json.dumps(data), json.dumps(response_data), origin, checkout_data)
+            "INSERT INTO transactions (id, status, request_data, bank_response, origin, checkout_data, full_name, phone_number, id_number, billing_address, shipping_address, email, amount_paid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (internal_transaction_id, "completed", json.dumps(data), json.dumps(response_data), origin, checkout_data, full_name, phone_number, id_number, billing_address, shipping_address, email, amount_paid)
         )
         conn.commit()
         conn.close()
@@ -240,7 +277,16 @@ def get_payment_details(transaction_id):
             "requestData": json.loads(record["request_data"]),
             "bankResponse": json.loads(record["bank_response"]),
             "origin": record["origin"],
-            "checkoutData": json.loads(record["checkout_data"] or '''{}''')
+            "checkoutData": json.loads(record["checkout_data"] or '''{}'''),
+            "personalData": {
+                "fullName": record["full_name"],
+                "phoneNumber": record["phone_number"],
+                "idNumber": record["id_number"],
+                "billingAddress": record["billing_address"],
+                "shippingAddress": record["shipping_address"],
+                "email": record["email"],
+                "amount": record["amount_paid"]
+            }
         }
         
         app.logger.info(f"Transacción encontrada: {transaction}")
