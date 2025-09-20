@@ -156,18 +156,22 @@ def _parse_bank_error(error_data):
 @app.route("/api/create-c2p-payment", methods=["POST"])
 def create_c2p_payment():
     data = request.get_json()
+    app.logger.info(f"Solicitud de pago recibida: {data}")
+
     error_response, status_code = _validate_payment_request(data)
     if error_response:
+        app.logger.warning(f"Validación de solicitud fallida: {error_response}")
         return jsonify(error_response), status_code
 
     try:
         payload = _build_mercantil_payload(data, config)
         headers = {"Content-Type": "application/json", "X-IBM-Client-Id": config.ibm_client_id}
         
-        app.logger.info(f"Enviando petición C2P a {config.c2p_url}")
+        app.logger.info(f"Enviando petición C2P a {config.c2p_url} con payload: {payload}")
         response = requests.post(config.c2p_url, headers=headers, json=payload, timeout=30)
         response.raise_for_status()
         response_data = response.json()
+        app.logger.info(f"Respuesta del banco recibida: {response_data}")
         
         internal_transaction_id = str(uuid.uuid4())
         origin = data.get('origin', 'unknown')
@@ -202,12 +206,16 @@ def create_c2p_payment():
             except ValueError:
                 app.logger.error(f"Respuesta del banco (HTTP {status_code}): {e.response.text}")
                 user_friendly_error = "El servicio de pago devolvió una respuesta inesperada."
-        
+        app.logger.error(f"Error en la petición al banco: {e}", exc_info=True)
         return jsonify({"error": user_friendly_error}), status_code
 
     except sqlite3.Error as db_error:
-        app.logger.error(f"Error al guardar en la base de datos: {db_error}")
+        app.logger.error(f"Error al guardar en la base de datos: {db_error}", exc_info=True)
         return jsonify({"error": "Error crítico al guardar la transacción."}), 500
+
+    except Exception as e:
+        app.logger.critical(f"Error inesperado en create_c2p_payment: {e}", exc_info=True)
+        return jsonify({"error": "Ocurrió un error inesperado. Por favor, intente de nuevo más tarde."}), 500
 
 @app.route("/api/payment-details/<string:transaction_id>", methods=['GET'])
 def get_payment_details(transaction_id):
