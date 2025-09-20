@@ -153,8 +153,17 @@ def _parse_bank_error(error_data):
                 return first_error["message"]
     return f"Error no especificado del banco. Por favor, contacte a soporte."
 
-@app.route("/api/create-c2p-payment", methods=["POST"])
+@app.route("/api/create-c2p-payment", methods=["POST", "OPTIONS"])
 def create_c2p_payment():
+    if request.method == 'OPTIONS':
+        headers = {
+            'Access-Control-Allow-Origin': '*' if '*' in origins else ",".join(origins),
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type',
+            'Access-Control-Max-Age': '3600'
+        }
+        return '', 204, headers
+
     data = request.get_json()
     error_response, status_code = _validate_payment_request(data)
     if error_response:
