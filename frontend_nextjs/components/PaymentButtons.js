@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from 'next/router';
 import {
   DevicePhoneMobileIcon,
@@ -8,10 +8,10 @@ import {
   ArrowPathIcon,
 } from "@heroicons/react/24/solid";
 
-function usePaymentForm() {
+function usePaymentForm(initialData) {
   const [formData, setFormData] = useState({
-    amount: "",
-    c2pPhone: "",
+    amount: initialData?.amount || "",
+    c2pPhone: initialData?.c2pPhone || "",
     purchaseKey: "",
   });
   const [formErrors, setFormErrors] = useState({});
@@ -20,8 +20,9 @@ function usePaymentForm() {
     let error = "";
     switch (name) {
       case 'c2pPhone':
+        // Asegurarse de que el número siempre tenga el prefijo 58 y 10 dígitos después
         if (!/^58\d{10}$/.test(value)) {
-          error = "Debe tener el formato 58XXXXXXXXXX.";
+          error = "Debe tener el formato 58XXXXXXXXXX (12 dígitos).";
         }
         break;
       case 'purchaseKey':
@@ -50,10 +51,10 @@ function usePaymentForm() {
     Object.values(formErrors).some(e => e) ||
     Object.values(formData).some(v => v === "");
 
-  return { formData, formErrors, isFormInvalid, handleInputChange };
+  return { formData, formErrors, isFormInvalid, handleInputChange, setFormData };
 }
 
-export default function PaymentButtons({ origin, checkoutData }) { // Aceptar checkoutData
+export default function PaymentButtons({ origin, checkoutData, personalData }) { // Aceptar personalData
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState({ message: "", type: "" });
@@ -62,8 +63,22 @@ export default function PaymentButtons({ origin, checkoutData }) { // Aceptar ch
     formErrors,
     isFormInvalid,
     handleInputChange,
-  } = usePaymentForm();
+    setFormData
+  } = usePaymentForm({
+    amount: personalData?.amount,
+    c2pPhone: personalData?.phoneNumber ? `58${personalData.phoneNumber}` : ""
+  });
   const [showKeyHelp, setShowKeyHelp] = useState(false);
+
+  useEffect(() => {
+    if (personalData) {
+      setFormData(prev => ({
+        ...prev,
+        amount: personalData.amount || "",
+        c2pPhone: personalData.phoneNumber ? `58${personalData.phoneNumber}` : ""
+      }));
+    }
+  }, [personalData, setFormData]);
 
   const handleC2pPayment = async (e) => {
     e.preventDefault();
@@ -74,8 +89,8 @@ export default function PaymentButtons({ origin, checkoutData }) { // Aceptar ch
       const res = await fetch(`${apiUrl}/api/create-c2p-payment`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // Incluir checkoutData en el cuerpo de la petición
-        body: JSON.stringify({ ...formData, origin, checkoutData }),
+        // Incluir checkoutData y personalData en el cuerpo de la petición
+        body: JSON.stringify({ ...formData, origin, checkoutData, personalData }),
       });
       const data = await res.json();
 
@@ -87,7 +102,8 @@ export default function PaymentButtons({ origin, checkoutData }) { // Aceptar ch
       if (transactionId) {
         // Limpiar el localStorage después de un pago exitoso
         localStorage.removeItem('checkoutData');
-        router.push(`/pago/${transactionId}`);
+        localStorage.removeItem('personalData'); // Limpiar también los datos personales
+        router.push(`/compra-final/${transactionId}`); // Redirigir a la nueva página de recibo
       } else {
         throw new Error("No se recibió un ID de transacción para generar el recibo.");
       }
@@ -139,7 +155,7 @@ export default function PaymentButtons({ origin, checkoutData }) { // Aceptar ch
 
           <button
             type="submit"
-            disabled={isLoading || isFormInvalid || !checkoutData}
+            disabled={isLoading || isFormInvalid || !personalData}
             className="w-full flex justify-center items-center gap-2 px-4 py-3 bg-green-600 hover:bg-green-700 transition-colors text-white font-semibold rounded-lg shadow-md disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             {isLoading ? <Spinner /> : <DevicePhoneMobileIcon className="h-5 w-5" />}

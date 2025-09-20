@@ -7,13 +7,17 @@ export default function PaymentPage() {
   const router = useRouter();
   const { origin } = router.query;
   const [checkoutData, setCheckoutData] = useState(null);
+  const [personalData, setPersonalData] = useState(null);
 
   useEffect(() => {
     console.log("Cargando página de PAGO...");
-    // Los datos del checkout se guardan en localStorage para persistir entre páginas.
-    const savedData = localStorage.getItem('checkoutData');
-    if (savedData) {
-      setCheckoutData(JSON.parse(savedData));
+    const savedCheckoutData = localStorage.getItem('checkoutData');
+    if (savedCheckoutData) {
+      setCheckoutData(JSON.parse(savedCheckoutData));
+    }
+    const savedPersonalData = localStorage.getItem('personalData');
+    if (savedPersonalData) {
+      setPersonalData(JSON.parse(savedPersonalData));
     }
   }, []);
 
@@ -30,8 +34,8 @@ export default function PaymentPage() {
               Realizar Pago
             </h1>
           </div>
-          {/* Pasar origin y checkoutData al componente de botones */}
-          <PaymentButtons origin={origin} checkoutData={checkoutData} />
+          {/* Pasar origin, checkoutData y personalData al componente de botones */}
+          <PaymentButtons origin={origin} checkoutData={checkoutData} personalData={personalData} />
         </div>
       </main>
     </>
