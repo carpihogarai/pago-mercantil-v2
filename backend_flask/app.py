@@ -54,6 +54,7 @@ app = Flask(__name__)
 # Configuración de CORS robusta
 origins = [
     "https://pago-mercantil-v2-xi.vercel.app",
+    "https://trends172.com",
     "http://localhost:3000" # Para desarrollo local
 ]
 CORS(app, origins=origins, methods=["GET", "POST", "OPTIONS"], allow_headers=["Content-Type"], supports_credentials=True)
