@@ -237,6 +237,17 @@ def get_payment_details(transaction_id):
         app.logger.error(f"Error al consultar la transacción ({transaction_id}): {e}")
         return jsonify({"error": "Error interno al leer los datos de la transacción."}), 500
 
+@app.route('/api', methods=['GET'])
+def health_check():
+    """
+    Endpoint de chequeo de salud para verificar que la API está activa.
+    """
+    app.logger.info("Health check solicitado.")
+    return jsonify({
+        "status": "ok",
+        "message": "API de Pagos C2P está en funcionamiento."
+    }), 200
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=False)
